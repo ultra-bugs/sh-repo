@@ -32,7 +32,7 @@ echo $'
 function setHostName
 {
     read -p "Setting up host name for your sever. Please provide a fully qualified domain name : " fqndomain
-     if [[ -f /etc/hostname ]]; then
+    if [[ -f /etc/hostname ]]; then
         cp /etc/hostname /etc/hostname-bak
         echo Backed up current hostname : /etc/hostname-bak
     fi
@@ -47,10 +47,13 @@ function setHostName
         echo "Added  127.0.0.1 ${fqndomain} www.${fqndomain} & ::1 ${fqndomain} www.${fqndomain} to /etc/hosts";
     fi
 }
+
 function getScriptDir
 {
     DIR="${BASH_SOURCE%/*}"
-    if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+    if [[ ! -d "$DIR" ]]; then
+        DIR="$PWD";
+    fi
     echo ${DIR};
 }
 
@@ -74,17 +77,18 @@ function updateSrc()
     echo "UPDATE APT SOURCE"
     apt-get update -y
 }
+
 #MARIA-DB DEB SRC
 function mariaSrc
 {
     echo "Add Src : Maria DB"
-        disId=$(lsb_release -is);
+    disId=$(lsb_release -is);
     if [[ "$disId" == "Ubuntu" ]] || [[ "$disId" == "Ubuntu" ]]; then
         codeName=$(lsb_release -cs);
         echo "$codeName Detected , install src.........";
         apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
         add-apt-repository "deb [arch=amd64,i386] http://mirrors.dotsrc.org/mariadb/repo/10.2/ubuntu $codeName main";
-#        test add-apt-repository 'deb [arch=amd64,i386] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.2/ubuntu zesty main';
+        #        test add-apt-repository 'deb [arch=amd64,i386] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.2/ubuntu zesty main';
         updateSrc
     else
         echo "Not ubuntu. Existing............";
@@ -144,13 +148,14 @@ function ennablePhp5.6
     update-alternatives --set php /usr/bin/php5.6
     service apache2 restart
 }
+
 #PHP 5.6
 function insPhp5
 {
     echo "Installing PHP 5.6"
     add-apt-repository ppa:ondrej/php
     updateSrc
-    apt-get install php5.6 php5.6-common php5.6-dev php5.6-curl php5.6-imagick php5.6-intl  php5.6-json  php5.6-mcrypt php5.6-xml  php5.6-pear -y
+    apt-get install php5.6 php5.6-common php5.6-dev php5.6-curl php5.6-imagick php5.6-intl php5.6-json php5.6-mcrypt php5.6-xml php5.6-pear -y
     apt-get install libapache2-mod-php5.6 -y
     ennablePhp5.6
     printf "\e[33m PHP : Done ! \e[0m \n "
@@ -182,14 +187,14 @@ function udtPhpMyAdmin
     if [[ "$isUdtMyadmin" != "n" ]] && [[ "$isUdtMyadmin" != "N" ]];
     then
         MyadmVer="4.7.5"
-		MyadmPath=/usr/share/phpmyadmin
-		cd ${MyadmPath};
-		cp -rvf ${MyadmPath} ${MyadmPath}-backup
-		echo "Downloading phpMyAdmin v$MyadmVer";
-        wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip ;
-		unzip phpMyAdmin-${MyadmVer}-all-languages
-		cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
-		printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
+        MyadmPath=/usr/share/phpmyadmin
+        cd ${MyadmPath};
+        cp -rvf ${MyadmPath} ${MyadmPath}-backup
+        echo "Downloading phpMyAdmin v$MyadmVer";
+        wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip;
+        unzip phpMyAdmin-${MyadmVer}-all-languages
+        cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
+        printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
     fi
 }
 

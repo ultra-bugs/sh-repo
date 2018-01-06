@@ -32,7 +32,9 @@ echo $'
 function getScriptDir
 {
     DIR="${BASH_SOURCE%/*}"
-    if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+    if [[ ! -d "$DIR" ]]; then
+        DIR="$PWD";
+    fi
     echo ${DIR};
 }
 
@@ -55,6 +57,7 @@ function checkDebVersion
         return 10;
     fi
 }
+
 function dotDebSrcInstall
 {
     echo "TODO : Build Update Src Func";
@@ -92,6 +95,7 @@ function dotDebSrcWheezy
         updateSrc
     fi
 }
+
 #DOTDEB PACKAGES
 function dotDebSrcJessie
 {
@@ -105,12 +109,14 @@ function dotDebSrcJessie
         updateSrc
     fi
 }
+
 #UPDATE APT SOURCE
 function updateSrc()
 {
     echo "UPDATE APT SOURCE"
     apt-get update -y
 }
+
 #MARIA-DB DEB SRC
 function mariaSrcWheezy
 {
@@ -119,13 +125,14 @@ function mariaSrcWheezy
     add-apt-repository 'deb [arch=amd64,i386] http://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.1/debian wheezy main'
     updateSrc
 }
+
 function mariaSrcJessie
 {
     echo "Add Src : Maria DB for Debian Jessie"
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
     echo "deb [arch=amd64,i386] http://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.1/debian jessie main
 deb-src http://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.1/debian jessie main" > /etc/apt/sources.list.d/maria-db.list
-updateSrc
+    updateSrc
 }
 
 #APACHE
@@ -191,7 +198,7 @@ function insGit
 function insPhp5
 {
     echo "Installing PHP 5.6-ZTS.........."
-    apt-get install php5 php5-dev php5-curl php5-imagick php5-intl  php5-json  php5-mcrypt php5-xsl php-pear -y
+    apt-get install php5 php5-dev php5-curl php5-imagick php5-intl php5-json php5-mcrypt php5-xsl php-pear -y
     apt-get install libapache2-mod-php5 -y
     a2enmod php5
     service apache2 restart
@@ -224,14 +231,14 @@ function udtPhpMyAdmin
     read -p "Update phpMyAdmin to $MyadmVer ? (Y/n)" isUdtMyadmin
     if [[ "$isUdtMyadmin" != "n" ]] && [[ "$isUdtMyadmin" != "N" ]];
     then
-		MyadmPath=/usr/share/phpmyadmin
-		cd ${MyadmPath};
-		cp -rvf ${MyadmPath} ${MyadmPath}-backup
-		echo "Downloading phpMyAdmin v$MyadmVer";
-    wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip ;
-		unzip phpMyAdmin-${MyadmVer}-all-languages
-		cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
-		printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
+        MyadmPath=/usr/share/phpmyadmin
+        cd ${MyadmPath};
+        cp -rvf ${MyadmPath} ${MyadmPath}-backup
+        echo "Downloading phpMyAdmin v$MyadmVer";
+        wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip;
+        unzip phpMyAdmin-${MyadmVer}-all-languages
+        cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
+        printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
     fi
 }
 
@@ -253,6 +260,7 @@ function insLetEncrypt
     apt-get install python-certbot-apache -t jessie-backports
     certbot --apache
 }
+
 #Adding packages source list....
 echo "Checking & Adding packages source list...."
 dotDebSrcInstall
