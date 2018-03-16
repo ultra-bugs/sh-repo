@@ -1,11 +1,19 @@
 #!/bin/bash
-
 if [ "$(whoami)" != 'root' ]; then
     echo $"You have no permission to run $0 as non-root user. Use sudo"
     exit 1;
 fi
-swapname=swap
 swapsize=2GB
+swapname=swap
+function getSwapSize {
+    echo "Enter Swapfile size in GB unit :"
+    read -r swapsize
+    if [[ -z "${swapsize//([0-9]+)(\.[0-9]+)?}" ]] && [[ -n "$swapsize" ]]; then
+        swapsize=${swapsize}GB;
+        return 0;
+    else getSwapSize; fi
+}
+getSwapSize;
 fallocate -l ${swapsize} /${swapname}
 chmod 600 /${swapname}
 mkswap /${swapname}
@@ -29,7 +37,8 @@ then
     echo "You need to modify it manually!";
 else
     echo "Adding vm.swappiness to system config ctl ......."
-    echo "vm.swappiness=10" >> /etc/sysctl.conf;
+    echo "
+	vm.swappiness=10" >> /etc/sysctl.conf;
     echo "Added contents : ";
     grep -F vm.swappiness /etc/sysctl.conf;
 fi
@@ -42,7 +51,8 @@ then
     echo "You need to modify it manually!";
 else
     echo "Adding vm.swappiness to system config ctl ......."
-    echo "vm.vfs_cache_pressure = 50" >> /etc/sysctl.conf;
+    echo "
+	vm.vfs_cache_pressure = 50" >> /etc/sysctl.conf;
     echo "Added contents : ";
     grep -F "vm.vfs_cache_pressure" /etc/sysctl.conf;
 fi

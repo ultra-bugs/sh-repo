@@ -78,6 +78,7 @@ then
     cd ../
     rm -rf ${TMPINSTALLDIR};
     cd bin
+    php magento module:disable PDP_Integration
     php magento module:enable PDP_Integration
     php magento setup:upgrade
     php magento setup:di:compile
