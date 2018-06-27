@@ -4,8 +4,9 @@ if [ "$(whoami)" != 'root' ]; then
     echo $"You have no permission to run $0 as non-root user. Use sudo"
     exit 1;
 fi
+read -p "Enter Swap Size (Number only , in GB) : " siz
 swapname=swap
-swapsize=2GB
+swapsize=${siz}GB
 fallocate -l ${swapsize} /${swapname}
 chmod 600 /${swapname}
 mkswap /${swapname}
@@ -41,7 +42,7 @@ then
     grep -F "vm.vfs_cache_pressure" /etc/sysctl.conf;
     echo "You need to modify it manually!";
 else
-    echo "Adding vm.swappiness to system config ctl ......."
+    echo "Adding vfs_cache_pressure to system config ctl ......."
     echo "vm.vfs_cache_pressure = 50" >> /etc/sysctl.conf;
     echo "Added contents : ";
     grep -F "vm.vfs_cache_pressure" /etc/sysctl.conf;
