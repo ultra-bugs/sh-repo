@@ -116,6 +116,11 @@ function insMariaDB
     if [[ "$runPostInsMaria" != "n" ]] && [[ "$runPostInsMaria" != "N" ]];
     then
         apt-get install mariadb-server -y
+        echo Stopping MYSQL
+        service mysql stop
+        mkdir /var/run/mysqld/
+        chown mysqld /var/run/mysqld/
+        service mysql start
     fi
     printf "\e[33m MARIA-DB : Done ! \e[0m \n "
 }
