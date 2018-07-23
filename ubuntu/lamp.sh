@@ -160,7 +160,7 @@ function insPhp5
     echo "Installing PHP 5.6"
     add-apt-repository ppa:ondrej/php
     updateSrc
-    apt-get install php5.6 php5.6-common php5.6-dev php5.6-curl php5.6-imagick php5.6-intl php5.6-json php5.6-mcrypt php5.6-xml php5.6-pear -y
+    apt-get install php5.6 php5.6-common php5.6-dev php5.6-curl php5.6-imagick php5.6-intl php5.6-json php5.6-mcrypt php5.6-xml php5.6-pear php5.6-dom php5.6-dg php5.6-mbstring php5.6-zip php5.6-soap -y
     apt-get install libapache2-mod-php5.6 -y
     ennablePhp5.6
     printf "\e[33m PHP : Done ! \e[0m \n "
