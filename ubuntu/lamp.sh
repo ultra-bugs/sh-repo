@@ -183,6 +183,7 @@ function insPhpMyAdmin
     apt-get install phpmyadmin -y
     enablePhp5.6
     udtPhpMyAdmin
+    sudo apt-get install php5.6-mysql
     printf "\e[33m PHP-My-Admin : Done ! \e[0m \n "
 }
 
