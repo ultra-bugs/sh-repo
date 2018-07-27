@@ -12,10 +12,12 @@ function udtPhpMyAdmin
 	}
 
 	function main {
+		versionUrl='https://www.phpmyadmin.net/home_page/version.json';
+		MyadmVer=$(curl $versionUrl -s | jq --raw-output '.version');
+		MyadmPath=/usr/share/phpmyadmin		
 		read -p "Update phpmyadmin to version :  $MyadmVer ? (Y/n)" isUdtMyadmin
 		if [[ "$isUdtMyadmin" != "n" ]] && [[ "$isUdtMyadmin" != "N" ]];
 		then
-			checkJq;
 			cd ${MyadmPath};
 			if [ -e "${MyadmPath}-backup" ]; then rm -rf "${MyadmPath}-backup"; fi
 			echo "Backing-up your old phpMyAdmin directory !";
@@ -37,9 +39,7 @@ function udtPhpMyAdmin
 			rm -rf $f;
 		done
 	}
-	versionUrl='https://www.phpmyadmin.net/home_page/version.json';
-	MyadmVer=$(curl $versionUrl -s | jq --raw-output '.version');
-	MyadmPath=/usr/share/phpmyadmin		
+	checkJq;
 	main;
 	removeUnzipedFiles;
 }
