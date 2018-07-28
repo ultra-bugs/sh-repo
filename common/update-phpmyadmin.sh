@@ -25,8 +25,10 @@ function udtPhpMyAdmin
 			echo "--- Backing-up your old phpMyAdmin directory ! ---";
 			cp -rf ${MyadmPath} ${MyadmPath}-backup
 			echo "--- Downloading phpMyAdmin v$MyadmVer ---";
-			wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip -o "${MyadmPath}/phpMyAdmin-${MyadmVer}-all-languages.zip";
-			unzip -o phpMyAdmin-${MyadmVer}-all-languages.zip
+			removeUnzipedFiles;
+			wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip;
+			unzip -o phpMyAdmin-${MyadmVer}-all-languages
+# ls -ll;
 			cp -rf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
 			printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
 		fi
