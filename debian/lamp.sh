@@ -194,6 +194,14 @@ function insGit
     printf "\e[33m GIT : Done ! \e[0m \n "
 }
 
+function enablePhp70
+{
+    a2disnmod php5
+    a2disnmod php7.1
+    a2enmod php7.0
+    update-alternatives --set php /usr/bin/php7.0
+    service apache2 restart
+}
 #PHP 5.6
 function insPhp5
 {
@@ -203,6 +211,14 @@ function insPhp5
     a2enmod php5
     service apache2 restart
     printf "\e[33m PHP : Done ! \e[0m \n "
+}
+
+function insPhp70
+{
+    echo "Installing PHP 5.6-ZTS.........."
+    apt-get install php7.0 php7.0-common php7.0-dev php7.0-gd php7.0-curl php7.0-imagick php7.0-intl php7.0-json php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-xml php7.0-zip -y
+    apt-get install libapache2-mod-php7.0 -y
+    enablePhp70
 }
 
 # COMPOSER
@@ -276,10 +292,31 @@ then
     insMariaDB
 fi
 
-read -p "Install PHP 5.6-ZTS ? (Y/n)" php
+read -p "Install PHP ? (Y/n)" php
 if [[ "$php" != "n" ]] && [[ "$php" != "N" ]];
 then
-    insPhp5
+    PS3='Select version to install : '
+    options=("PHP 5.6" "PHP 7.0" "Cancel")
+    select opt in "${options[@]}"
+    do
+        case $opt in
+            "PHP 5.6")
+                echo "Installing....";
+                insPhp5;
+                break
+                ;;
+            "PHP 7.0")
+                echo "Installing....";
+                insPhp70;
+                break
+                ;;
+            "Cancel")
+                echo "Skipping install PHP";
+                break
+                ;;
+            *) echo "invalid option $REPLY";;
+        esac
+    done
 fi
 
 read -p "Install Php MyAdmin ? (Y/n)" myadmin
