@@ -87,7 +87,7 @@ function mariaSrc
         codeName=$(lsb_release -cs);
         echo "$codeName Detected , install src.........";
         apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-        add-apt-repository "deb [arch=amd64,i386] http://mirrors.dotsrc.org/mariadb/repo/10.2/ubuntu $codeName main";
+        add-apt-repository "deb [arch=amd64,i386] http://mirrors.dotsrc.org/mariadb/repo/10.3/ubuntu $codeName main";
         #        test add-apt-repository 'deb [arch=amd64,i386] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.2/ubuntu zesty main';
         updateSrc
     else
