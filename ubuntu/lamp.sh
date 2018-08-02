@@ -87,7 +87,7 @@ function mariaSrc
         codeName=$(lsb_release -cs);
         echo "$codeName Detected , install src.........";
         apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-        add-apt-repository "deb [arch=amd64,i386] http://mirrors.dotsrc.org/mariadb/repo/10.2/ubuntu $codeName main";
+        add-apt-repository "deb [arch=amd64,i386] http://mirrors.dotsrc.org/mariadb/repo/10.3/ubuntu $codeName main";
         #        test add-apt-repository 'deb [arch=amd64,i386] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.2/ubuntu zesty main';
         updateSrc
     else
@@ -116,6 +116,11 @@ function insMariaDB
     if [[ "$runPostInsMaria" != "n" ]] && [[ "$runPostInsMaria" != "N" ]];
     then
         apt-get install mariadb-server -y
+        echo Stopping MYSQL
+        service mysql stop
+        mkdir /var/run/mysqld/
+        chown mysqld /var/run/mysqld/
+        service mysql start
     fi
     printf "\e[33m MARIA-DB : Done ! \e[0m \n "
 }
@@ -155,7 +160,7 @@ function insPhp5
     echo "Installing PHP 5.6"
     add-apt-repository ppa:ondrej/php
     updateSrc
-    apt-get install php5.6 php5.6-common php5.6-dev php5.6-curl php5.6-imagick php5.6-intl php5.6-json php5.6-mcrypt php5.6-xml php5.6-pear -y
+    apt-get install php5.6 php5.6-common php5.6-dev php5.6-curl php5.6-imagick php5.6-intl php5.6-json php5.6-mcrypt php5.6-xml php5.6-pear php5.6-dom php5.6-gd php5.6-mbstring php5.6-zip php5.6-soap -y
     apt-get install libapache2-mod-php5.6 -y
     ennablePhp5.6
     printf "\e[33m PHP : Done ! \e[0m \n "
@@ -178,6 +183,8 @@ function insPhpMyAdmin
     apt-get install phpmyadmin -y
     enablePhp5.6
     udtPhpMyAdmin
+    sudo apt-get install php5.6-mysqli
+    sudo apt-get install php5.6-mysql
     printf "\e[33m PHP-My-Admin : Done ! \e[0m \n "
 }
 

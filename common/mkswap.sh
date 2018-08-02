@@ -50,9 +50,8 @@ then
     grep -F "vm.vfs_cache_pressure" /etc/sysctl.conf;
     echo "You need to modify it manually!";
 else
-    echo "Adding vm.swappiness to system config ctl ......."
-    echo "
-	vm.vfs_cache_pressure = 50" >> /etc/sysctl.conf;
+    echo "Adding vfs_cache_pressure to system config ctl ......."
+    echo "vm.vfs_cache_pressure = 50" >> /etc/sysctl.conf;
     echo "Added contents : ";
     grep -F "vm.vfs_cache_pressure" /etc/sysctl.conf;
 fi
