@@ -196,8 +196,8 @@ function insGit
 
 function enablePhp70
 {
-    a2disnmod php5
-    a2disnmod php7.1
+    a2dismod php5
+    a2dismod php7.1
     a2enmod php7.0
     update-alternatives --set php /usr/bin/php7.0
     service apache2 restart
