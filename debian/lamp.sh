@@ -75,9 +75,11 @@ function dotDebSrcInstall
             dotDebSrcJessie
         elif [[ "$codeName" == "stretch" ]]; then
             echo "Stretch Detected , installing";
-            echo "deb http://ftp.debian.org/debian stretch-backports main contrib non-free
-deb-src http://ftp.debian.org/debian stretch-backports main contrib non-free" > /etc/apt/source.list.d/backport.list ;
-            echo "deb https://packages.sury.org/php/ stretch main" > /etc/apt/source.list.d/php-sury.list ;
+			if ! grep -q 'stretch' /etc/apt/sources.list.d/backport.list; then
+				echo "deb http://ftp.debian.org/debian stretch-backports main contrib non-free
+deb-src http://ftp.debian.org/debian stretch-backports main contrib non-free" > /etc/apt/sources.list.d/backport.list ;
+			fi
+			addSrcSury
             updateSrc
         else
             #NOT SUPPORTED !
@@ -87,6 +89,17 @@ deb-src http://ftp.debian.org/debian stretch-backports main contrib non-free" > 
     else
         return 10;
     fi
+}
+
+function addSrcSury
+{
+	if [ "$(whoami)" != "root" ]; then
+		SUDO=sudo
+	fi
+
+	${SUDO} apt-get -y install apt-transport-https lsb-release ca-certificates
+	${SUDO} wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+	${SUDO} sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php-sury.list'
 }
 
 #DOTDEB PACKAGES
@@ -187,7 +200,7 @@ function insMariaDB
     else
         return 10;
     fi
-    read -p "Do u want to run install cmd (including post-install script , u should ignore it if u\'re using LISH shell)\nYes / no ?" runPostInsMaria
+    read -p "Do u want to run install cmd (including post-install script , u should ignore it if u're using LISH shell). Y/n ?" runPostInsMaria
     if [[ "$runPostInsMaria" != "n" ]] && [[ "$runPostInsMaria" != "N" ]];
     then
         apt-get install mariadb-server -y
@@ -229,6 +242,7 @@ function enablePhp71
     a2dismod php5
     a2dismod php7.0
     a2enmod php7.1
+	a2enmod proxy_fcgi setenvif
     a2enconf php7.1-fpm
     update-alternatives --set php /usr/bin/php7.1
     service apache2 restart
@@ -273,15 +287,6 @@ function insComposer
     printf "\e[33m COMPOSER : Done ! \e[0m \n "
 }
 
-#PHP-My-Admin
-function insPhpMyAdmin
-{
-    apt-get install phpmyadmin -y
-    service apache2 restart
-    udtPhpMyAdmin
-    printf "\e[33m PHP-My-Admin : Done ! \e[0m \n "
-}
-
 function udtPhpMyAdmin
 {
     MyadmVer="4.7.5"
@@ -297,6 +302,15 @@ function udtPhpMyAdmin
         cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
         printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
     fi
+}
+
+#PHP-My-Admin
+function insPhpMyAdmin
+{
+    apt-get install phpmyadmin -y
+    service apache2 restart
+    udtPhpMyAdmin
+    printf "\e[33m PHP-My-Admin : Done ! \e[0m \n "
 }
 
 
@@ -337,7 +351,7 @@ read -p "Install PHP ? (Y/n)" php
 if [[ "$php" != "n" ]] && [[ "$php" != "N" ]];
 then
     PS3='Select version to install : '
-    options=("PHP 5.6" "PHP 7.0" "Cancel")
+    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "Cancel")
     select opt in "${options[@]}"
     do
         case $opt in
