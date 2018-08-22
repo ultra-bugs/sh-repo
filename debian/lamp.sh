@@ -337,7 +337,7 @@ read -p "Install PHP ? (Y/n)" php
 if [[ "$php" != "n" ]] && [[ "$php" != "N" ]];
 then
     PS3='Select version to install : '
-    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "Cancel")
+    options=("PHP 5.6" "PHP 7.0" "Cancel")
     select opt in "${options[@]}"
     do
         case $opt in
