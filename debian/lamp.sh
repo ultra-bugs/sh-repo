@@ -289,19 +289,25 @@ function insComposer
 
 function udtPhpMyAdmin
 {
-    MyadmVer="4.7.5"
-    read -p "Update phpMyAdmin to $MyadmVer ? (Y/n)" isUdtMyadmin
-    if [[ "$isUdtMyadmin" != "n" ]] && [[ "$isUdtMyadmin" != "N" ]];
-    then
-        MyadmPath=/usr/share/phpmyadmin
-        cd ${MyadmPath};
-        cp -rvf ${MyadmPath} ${MyadmPath}-backup
-        echo "Downloading phpMyAdmin v$MyadmVer";
-        wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip;
-        unzip phpMyAdmin-${MyadmVer}-all-languages
-        cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
-        printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
-    fi
+    # MyadmVer="4.7.5"
+    # read -p "Update phpMyAdmin to $MyadmVer ? (Y/n)" isUdtMyadmin
+    # if [[ "$isUdtMyadmin" != "n" ]] && [[ "$isUdtMyadmin" != "N" ]];
+    # then
+        # MyadmPath=/usr/share/phpmyadmin
+        # cd ${MyadmPath};
+        # cp -rvf ${MyadmPath} ${MyadmPath}-backup
+        # echo "Downloading phpMyAdmin v$MyadmVer";
+        # wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip;
+        # unzip phpMyAdmin-${MyadmVer}-all-languages
+        # cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
+        # printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
+    # fi
+	curl -sL https://raw.githubusercontent.com/Z-Programing/sh-repo/master/common/update-phpmyadmin.sh | bash -
+}
+
+function makeSwap
+{
+	curl -sL https://raw.githubusercontent.com/Z-Programing/sh-repo/master/common/mkswap.sh | bash -
 }
 
 #PHP-My-Admin
@@ -335,6 +341,13 @@ function insLetEncrypt
 #Adding packages source list....
 echo "Checking & Adding packages source list...."
 dotDebSrcInstall
+
+read -p "Make Swap Partion ? (Y/n)" swp
+if [[ "$swp" != "n" ]] && [[ "$swp" != "N" ]];
+then
+    makeSwap
+fi
+
 read -p "Install Apache ? (Y/n)" apa
 if [[ "$apa" != "n" ]] && [[ "$apa" != "N" ]];
 then
