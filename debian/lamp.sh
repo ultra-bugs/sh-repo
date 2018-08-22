@@ -49,7 +49,6 @@ function checkDebVersion
         elif [[ "$codeName" == "stretch" ]]; then
             echo "Stretch - Debian 9";
             return 0;
-        else
         elif [[ "$codeName" == "jessie" ]]; then
             echo "Jessie";
             return 0;
@@ -338,7 +337,7 @@ read -p "Install PHP ? (Y/n)" php
 if [[ "$php" != "n" ]] && [[ "$php" != "N" ]];
 then
     PS3='Select version to install : '
-    options=("PHP 5.6" "PHP 7.0" "Cancel")
+    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "Cancel")
     select opt in "${options[@]}"
     do
         case $opt in
