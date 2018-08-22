@@ -46,6 +46,10 @@ function checkDebVersion
         if [[ "$codeName" == "wheezy" ]]; then
             echo 'Wheezy';
             return 0;
+        elif [[ "$codeName" == "stretch" ]]; then
+            echo "Stretch - Debian 9";
+            return 0;
+        else
         elif [[ "$codeName" == "jessie" ]]; then
             echo "Jessie";
             return 0;
@@ -70,6 +74,12 @@ function dotDebSrcInstall
         elif [[ "$codeName" == "jessie" ]]; then
             echo "Jessie Detected , installing";
             dotDebSrcJessie
+        elif [[ "$codeName" == "stretch" ]]; then
+            echo "Stretch Detected , installing";
+            echo "deb http://ftp.debian.org/debian stretch-backports main contrib non-free
+deb-src http://ftp.debian.org/debian stretch-backports main contrib non-free" > /etc/apt/source.list.d/backport.list ;
+            echo "deb https://packages.sury.org/php/ stretch main" > /etc/apt/source.list.d/php-sury.list ;
+            updateSrc
         else
             #NOT SUPPORTED !
             echo "NOT SUPPORTED OS , STOP !";
@@ -135,6 +145,15 @@ deb-src http://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.1/debian jessie 
     updateSrc
 }
 
+function mariaSrcStretch
+{
+    echo "Add Src : Maria DB 10.3 for Debian Stretch"
+    apt-get install software-properties-common dirmngr
+    apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xF1656F24C74CD1D8
+    add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mirror.rackspace.com/mariadb/repo/10.3/debian stretch main'
+    updateSrc
+}
+
 #APACHE
 function insApache
 {
@@ -158,6 +177,9 @@ function insMariaDB
         elif [[ "$codeName" == "jessie" ]]; then
             echo "Jessie Detected , installing src";
             mariaSrcJessie
+        elif [[ "$codeName" == "stretch" ]]; then
+            echo "stretch Detected , installing src";
+            mariaSrcStretch
         else
             #NOT SUPPORTED !
             echo "NOT SUPPORTED OS , STOP !";
@@ -202,6 +224,18 @@ function enablePhp70
     update-alternatives --set php /usr/bin/php7.0
     service apache2 restart
 }
+
+function enablePhp71
+{
+    a2dismod php5
+    a2dismod php7.0
+    a2enmod php7.1
+    a2enconf php7.1-fpm
+    update-alternatives --set php /usr/bin/php7.1
+    service apache2 restart
+    service php7.1-fpm restart
+}
+
 #PHP 5.6
 function insPhp5
 {
@@ -219,6 +253,14 @@ function insPhp70
     apt-get install php7.0 php7.0-common php7.0-dev php7.0-gd php7.0-curl php7.0-imagick php7.0-intl php7.0-json php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-xml php7.0-zip -y
     apt-get install libapache2-mod-php7.0 -y
     enablePhp70
+}
+
+function insPhp71
+{
+    echo "Installing PHP 7.1 (with FPM) .........."
+    apt-get install php7.1 php7.1-fpm php7.1-common php7.1-dev php7.1-gd php7.1-curl php7.1-imagick php7.1-intl php7.1-json php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-xml php7.1-zip -y
+    apt-get install libapache2-mod-php7.1 -y
+    enablePhp71
 }
 
 # COMPOSER
@@ -308,6 +350,11 @@ then
             "PHP 7.0")
                 echo "Installing....";
                 insPhp70;
+                break
+                ;;
+            "PHP 7.1")
+                echo "Installing....";
+                insPhp71;
                 break
                 ;;
             "Cancel")
