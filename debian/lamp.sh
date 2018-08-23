@@ -160,7 +160,7 @@ deb-src http://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.1/debian jessie 
 function mariaSrcStretch
 {
     echo "Add Src : Maria DB 10.3 for Debian Stretch"
-    apt-get install software-properties-common dirmngr
+    apt-get install software-properties-common dirmngr -y
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xF1656F24C74CD1D8
     add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mirror.rackspace.com/mariadb/repo/10.3/debian stretch main'
     updateSrc
@@ -342,11 +342,10 @@ function insLetEncrypt
 echo "Checking & Adding packages source list...."
 dotDebSrcInstall
 
-read -p "Make Swap Partion ? (Y/n)" swp
-if [[ "$swp" != "n" ]] && [[ "$swp" != "N" ]];
-then
-    makeSwap
-fi
+# read -p "Make Swap Partion ? (Y/n)" swsp
+# if [[ "$swsp" != "n" ]] && [[ "$swsp" != "N" ]]; then
+    # makeSwap
+# fi
 
 read -p "Install Apache ? (Y/n)" apa
 if [[ "$apa" != "n" ]] && [[ "$apa" != "N" ]];
