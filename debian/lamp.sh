@@ -144,7 +144,7 @@ function mariaSrcWheezy
 {
     echo "Add Src : Maria DB for Debian Wheezy"
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
-    add-apt-repository 'deb [arch=amd64,i386] http://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.1/debian wheezy main'
+    add-apt-repository 'deb [arch=amd64,i386] http://mirror.rackspace.com/mariadb/repo/10.3/debian wheezy main'
     updateSrc
 }
 
@@ -152,8 +152,8 @@ function mariaSrcJessie
 {
     echo "Add Src : Maria DB for Debian Jessie"
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
-    echo "deb [arch=amd64,i386] http://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.1/debian jessie main
-deb-src http://ftp.yz.yamagata-u.ac.jp/pub/dbms/mariadb/repo/10.1/debian jessie main" > /etc/apt/sources.list.d/maria-db.list
+    echo "deb [arch=amd64,i386] http://mirror.rackspace.com/mariadb/repo/10.3/debian jessie main
+deb-src http://mirror.rackspace.com/mariadb/repo/10.3/debian jessie main" > /etc/apt/sources.list.d/maria-db.list
     updateSrc
 }
 
