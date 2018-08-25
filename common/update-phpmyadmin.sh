@@ -25,10 +25,10 @@ function udtPhpMyAdmin
 			echo "--- Backing-up your old phpMyAdmin directory ! ---";
 			cp -rf ${MyadmPath} ${MyadmPath}-backup
 			echo "--- Downloading phpMyAdmin v$MyadmVer ---";
-			removeUnzipedFiles;
-			wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip;
-			unzip -o phpMyAdmin-${MyadmVer}-all-languages
-# ls -ll;
+			echo "URL : https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip";
+			echo "OUT : ${MyadmPath}/phpMyAdmin-${MyadmVer}-all-languages.zip"
+			wget https://files.phpmyadmin.net/phpMyAdmin/${MyadmVer}/phpMyAdmin-${MyadmVer}-all-languages.zip -O "${MyadmPath}/phpMyAdmin-${MyadmVer}-all-languages.zip";
+			unzip "${MyadmPath}/phpMyAdmin-${MyadmVer}-all-languages.zip"
 			cp -rf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
 			printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
 		fi
@@ -36,7 +36,7 @@ function udtPhpMyAdmin
 	
 	function removeUnzipedFiles()
 	{
-		toRm=$(find ${MyadmPath} -iname "*all-languages");
+		toRm=$(find ${MyadmPath} -iname "*all-languages*");
 		echo $toRm;
 		for f in $toRm; do
 			echo Removing: $f;
