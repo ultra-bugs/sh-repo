@@ -203,7 +203,9 @@ function insMariaDB
     read -p "Do u want to run install cmd (including post-install script , u should ignore it if u're using LISH shell). Y/n ?" runPostInsMaria
     if [[ "$runPostInsMaria" != "n" ]] && [[ "$runPostInsMaria" != "N" ]];
     then
-        apt-get install mariadb-server -y
+        apt-get remove --purge mysql* -y
+        apt-get remove --purge mysql -y
+	apt-get install mariadb-server -y
     fi
     printf "\e[33m MARIA-DB : Done ! \e[0m \n "
 }
