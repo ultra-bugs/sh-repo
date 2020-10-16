@@ -228,6 +228,7 @@ function insMariaDB
         apt-get remove --purge mysql* -y
         apt-get remove --purge mysql -y
         apt-get install mariadb-server -y
+        mysql_secure_installation
     fi
     printf "\e[33m MARIA-DB : Done ! \e[0m \n "
 }
@@ -403,6 +404,10 @@ function makeSwap
 #PHP-My-Admin
 function insPhpMyAdmin
 {
+    if [ "$(lsb_release -cs)" == "buster" ]; then
+        echo "INFO : install php-twig on Debian 10"
+        apt-get install -t buster-backports install php-twig -y
+    fi
     apt-get install phpmyadmin -y
     service apache2 restart
     udtPhpMyAdmin
