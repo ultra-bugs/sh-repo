@@ -52,6 +52,9 @@ function checkDebVersion
         elif [[ "$codeName" == "jessie" ]]; then
             echo "Jessie";
             return 0;
+        elif [[ "$codeName" == "buster" ]]; then
+            echo "Buster - Debian 10";
+            return 0;
         else
             #NOT SUPPORTED !
             return 11;
@@ -68,18 +71,26 @@ function dotDebSrcInstall
     if [[ "$disId" == "Debian" ]] || [[ "$disId" == "debian" ]]; then
         codeName=$(lsb_release -cs);
         if [[ "$codeName" == "wheezy" ]]; then
-            echo 'Wheezy Detected , installing';
+            echo 'INFO: Wheezy Detected , installing';
             dotDebSrcWheezy
         elif [[ "$codeName" == "jessie" ]]; then
-            echo "Jessie Detected , installing";
+            echo "INFO: Jessie Detected , installing";
             dotDebSrcJessie
         elif [[ "$codeName" == "stretch" ]]; then
-            echo "Stretch Detected , installing";
-			if ! grep -q 'stretch' /etc/apt/sources.list.d/backport.list; then
-				echo "deb http://ftp.debian.org/debian stretch-backports main contrib non-free
+            echo "INFO: Stretch Detected , installing";
+            if ! grep -q 'stretch' /etc/apt/sources.list.d/backport.list; then
+              echo "deb http://ftp.debian.org/debian stretch-backports main contrib non-free
 deb-src http://ftp.debian.org/debian stretch-backports main contrib non-free" > /etc/apt/sources.list.d/backport.list ;
-			fi
-			addSrcSury
+            fi
+            addSrcSury
+            updateSrc
+        elif [[ "$codeName" == "buster" ]]; then
+            echo "INFO: Buster - Debian 10 Detected , installing";
+            if ! grep -q 'stretch' /etc/apt/sources.list.d/backport.list; then
+              echo "deb http://deb.debian.org/debian buster-backports main contrib non-free
+deb-src http://deb.debian.org/debian buster-backports main contrib non-free" > /etc/apt/sources.list.d/backport.list ;
+            fi
+            addSrcSury
             updateSrc
         else
             #NOT SUPPORTED !
@@ -93,25 +104,25 @@ deb-src http://ftp.debian.org/debian stretch-backports main contrib non-free" > 
 
 function addSrcSury
 {
-	if [ "$(whoami)" != "root" ]; then
-		SUDO=sudo
-	fi
+  if [ "$(whoami)" != "root" ]; then
+    SUDO=sudo
+  fi
 
-	${SUDO} apt-get -y install apt-transport-https lsb-release ca-certificates
-	${SUDO} wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-	${SUDO} sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php-sury.list'
+  ${SUDO} apt-get -y install apt-transport-https lsb-release ca-certificates
+  ${SUDO} wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+  ${SUDO} sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php-sury.list'
 }
 
 #DOTDEB PACKAGES
 function dotDebSrcWheezy
 {
     if ! grep -q 'dotdeb.org' /etc/apt/sources.list.d/dotdeb.list; then
-        echo "Add Src : dotDeb 7"
+        echo "INFO: Add Src : dotDeb 7"
         echo "deb http://packages.dotdeb.org wheezy all
         deb-src http://packages.dotdeb.org wheezy all
         deb http://packages.dotdeb.org wheezy-php56-zts all
         deb-src http://packages.dotdeb.org wheezy-php56-zts all" > /etc/apt/sources.list.d/dotdeb.list
-        echo "Getting Src key\n"
+        echo "INFO: Getting Src key\n"
         wget https://www.dotdeb.org/dotdeb.gpg
         apt-key add dotdeb.gpg
         updateSrc
@@ -122,10 +133,10 @@ function dotDebSrcWheezy
 function dotDebSrcJessie
 {
     if ! grep -q 'dotdeb.org' /etc/apt/sources.list.d/dotdeb.list; then
-        echo "adding apt source list......."
+        echo "INFO: adding apt source list......."
         echo "deb http://packages.dotdeb.org jessie all
         deb-src http://packages.dotdeb.org jessie all" > /etc/apt/sources.list.d/dotdeb.list
-        echo "Getting Src key"
+        echo "INFO: Getting Src key"
         wget https://www.dotdeb.org/dotdeb.gpg
         apt-key add dotdeb.gpg
         updateSrc
@@ -135,14 +146,14 @@ function dotDebSrcJessie
 #UPDATE APT SOURCE
 function updateSrc()
 {
-    echo "UPDATE APT SOURCE"
+    echo "INFO: UPDATE APT SOURCE...."
     apt-get update -y
 }
 
 #MARIA-DB DEB SRC
 function mariaSrcWheezy
 {
-    echo "Add Src : Maria DB for Debian Wheezy"
+    echo "INFO: Add Src : Maria DB for Debian Wheezy"
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
     add-apt-repository 'deb [arch=amd64,i386] http://mirror.rackspace.com/mariadb/repo/10.3/debian wheezy main'
     updateSrc
@@ -150,7 +161,7 @@ function mariaSrcWheezy
 
 function mariaSrcJessie
 {
-    echo "Add Src : Maria DB for Debian Jessie"
+    echo "INFO: Add Src : Maria DB for Debian Jessie"
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db
     echo "deb [arch=amd64,i386] http://mirror.rackspace.com/mariadb/repo/10.3/debian jessie main
 deb-src http://mirror.rackspace.com/mariadb/repo/10.3/debian jessie main" > /etc/apt/sources.list.d/maria-db.list
@@ -159,17 +170,25 @@ deb-src http://mirror.rackspace.com/mariadb/repo/10.3/debian jessie main" > /etc
 
 function mariaSrcStretch
 {
-    echo "Add Src : Maria DB 10.3 for Debian Stretch"
+    echo "INFO: Add Src : Maria DB 10.3 for Debian Stretch"
     apt-get install software-properties-common dirmngr -y
     apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xF1656F24C74CD1D8
     add-apt-repository 'deb [arch=amd64,i386,ppc64el] http://mirror.rackspace.com/mariadb/repo/10.3/debian stretch main'
+    updateSrc
+}
+function mariaSrcDeb10
+{
+    echo "INFO: Add Src : Maria DB v10.5 for Debian 10 (Mirror Rackspace)"
+    apt-get install software-properties-common dirmngr -y
+    apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
+    add-apt-repository 'deb [arch=amd64] https://mirror.rackspace.com/mariadb/repo/10.5/debian buster main'
     updateSrc
 }
 
 #APACHE
 function insApache
 {
-    echo "Installing Apache 2.4.........."
+    echo "INFO: Installing Apache 2.4.........."
     apt-get install zip unzip gcc curl -y
     apt-get install -y apache2
     a2enmod rewrite headers proxy ssl
@@ -184,14 +203,17 @@ function insMariaDB
     if [[ "$disId" == "Debian" ]] || [[ "$disId" == "debian" ]]; then
         codeName=$(lsb_release -cs);
         if [[ "$codeName" == "wheezy" ]]; then
-            echo 'Wheezy Detected , installing src';
+            echo 'INFO: Wheezy Detected , installing src';
             mariaSrcWheezy
         elif [[ "$codeName" == "jessie" ]]; then
-            echo "Jessie Detected , installing src";
+            echo "INFO: Jessie Detected , installing src";
             mariaSrcJessie
         elif [[ "$codeName" == "stretch" ]]; then
-            echo "stretch Detected , installing src";
+            echo "INFO: stretch Detected , installing src";
             mariaSrcStretch
+        elif [[ "$codeName" == "buster" ]]; then
+            echo "INFO: Debian 10 (buster) Detected , installing maria src";
+            mariaSrcDeb10
         else
             #NOT SUPPORTED !
             echo "NOT SUPPORTED OS , STOP !";
@@ -205,27 +227,69 @@ function insMariaDB
     then
         apt-get remove --purge mysql* -y
         apt-get remove --purge mysql -y
-	apt-get install mariadb-server -y
+        apt-get install mariadb-server -y
     fi
     printf "\e[33m MARIA-DB : Done ! \e[0m \n "
 }
 
 #NODE JS
-function insNode
+function postInsNode
 {
-    echo "Installing NODEJS.........."
+    apt-get install -y build-essential
+    npm install -g npm gulp bower
+}
+
+function insNode12x
+{
+    echo "INFO :Start Install NODEJS.........."
+    apt-get install python-software-properties curl -y
+    curl -sL https://deb.nodesource.com/setup_12.x | bash -
+    apt-get install -y nodejs
+    postInsNode
+    printf "\e[33m NODEJS 12.x : Done ! \e[0m \n "
+}
+
+function insNode6x
+{
+    echo "INFO :Start Install NODEJS.........."
     apt-get install python-software-properties curl -y
     curl -sL https://deb.nodesource.com/setup_6.x | bash -
     apt-get install -y nodejs
-    apt-get install -y build-essential
-    npm install -g npm gulp bower
-    printf "\e[33m NODEJS : Done ! \e[0m \n "
+    postInsNode
+    printf "\e[33m NODEJS 6.x : Done ! \e[0m \n "
+}
+
+function insNode
+{
+    echo "INFO :Preparing install NODEJS.........."
+    PS3='Select version to install : '
+    options=("NodeJs 6.x" "NodeJs 12.x" "Cancel")
+    select opt in "${options[@]}"
+    do
+        case $opt in
+            "NodeJs 6.x")
+                echo "INFO :Installing....";
+                insNode6x;
+                break
+                ;;
+            "NodeJs 12.x")
+                echo "INFO :Installing....";
+                insNode12x;
+                break
+                ;;
+            "Cancel")
+                echo "INFO :Skipping install PHP";
+                break
+                ;;
+            *) echo "invalid option $REPLY";;
+        esac
+    done
 }
 
 #GIT
 function insGit
 {
-    echo "Installing Git.........."
+    echo "INFO :Installing Git.........."
     apt-get install git -y
     printf "\e[33m GIT : Done ! \e[0m \n "
 }
@@ -243,18 +307,35 @@ function enablePhp71
 {
     a2dismod php5
     a2dismod php7.0
+    a2dismod php7.2
+    a2dismod php7.3
     a2enmod php7.1
-	a2enmod proxy_fcgi setenvif
+    a2enmod proxy_fcgi setenvif
     a2enconf php7.1-fpm
     update-alternatives --set php /usr/bin/php7.1
     service apache2 restart
     service php7.1-fpm restart
 }
 
+function enablePhp73
+{
+    echo "INFO :Enabling PHP 7.3 FPM"
+    a2dismod php5
+    a2dismod php7.0
+    a2dismod php7.1
+    a2dismod php7.2
+#    a2enmod php7.3
+    a2enmod proxy_fcgi setenvif
+    a2enconf php7.3-fpm
+    update-alternatives --set php /usr/bin/php7.3
+    service apache2 restart
+    service php7.3-fpm restart
+}
+
 #PHP 5.6
 function insPhp5
 {
-    echo "Installing PHP 5.6-ZTS.........."
+    echo "INFO :Installing PHP 5.6-ZTS.........."
     apt-get install php5 php5-dev php5-curl php5-imagick php5-intl php5-json php5-mcrypt php5-xsl php-pear -y
     apt-get install libapache2-mod-php5 -y
     a2enmod php5
@@ -264,7 +345,7 @@ function insPhp5
 
 function insPhp70
 {
-    echo "Installing PHP 5.6-ZTS.........."
+    echo "INFO :Installing PHP 7.0"
     apt-get install php7.0 php7.0-common php7.0-dev php7.0-gd php7.0-curl php7.0-imagick php7.0-intl php7.0-json php7.0-mbstring php7.0-mcrypt php7.0-mysql php7.0-xml php7.0-zip -y
     apt-get install libapache2-mod-php7.0 -y
     enablePhp70
@@ -272,10 +353,17 @@ function insPhp70
 
 function insPhp71
 {
-    echo "Installing PHP 7.1 (with FPM) .........."
+    echo "INFO :Installing PHP 7.1 (with FPM) .........."
     apt-get install php7.1 php7.1-fpm php7.1-common php7.1-dev php7.1-gd php7.1-curl php7.1-imagick php7.1-intl php7.1-json php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-xml php7.1-zip -y
     apt-get install libapache2-mod-php7.1 -y
     enablePhp71
+}
+
+function insPhp73
+{
+    echo "INFO :Installing PHP 7.3 (with FPM, No Apache Module) .........."
+    apt-get install php7.3 php7.3-bcmath php7.3-bz2 php7.3-cli php7.3-common php7.3-curl php7.3-fpm php7.3-gd php7.3-json php7.3-mbstring php7.3-mysql php7.3-opcache php7.3-readline php7.3-xml php7.3-zip -y
+    enablePhp73
 }
 
 # COMPOSER
@@ -304,12 +392,12 @@ function udtPhpMyAdmin
         # cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
         # printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
     # fi
-	curl -sL https://raw.githubusercontent.com/Z-Programing/sh-repo/master/common/update-phpmyadmin.sh | bash -
+  curl -sL https://raw.githubusercontent.com/z-programing/sh-repo/master/common/update-phpmyadmin.sh | bash -
 }
 
 function makeSwap
 {
-	curl -sL https://raw.githubusercontent.com/Z-Programing/sh-repo/master/common/mkswap.sh | bash -
+  curl -sL https://raw.githubusercontent.com/z-programing/sh-repo/master/common/mkswap.sh | bash -
 }
 
 #PHP-My-Admin
@@ -341,7 +429,7 @@ function insLetEncrypt
 }
 
 #Adding packages source list....
-echo "Checking & Adding packages source list...."
+echo "INFO :Checking & Adding packages source list...."
 dotDebSrcInstall
 
 # read -p "Make Swap Partion ? (Y/n)" swsp
@@ -365,30 +453,35 @@ read -p "Install PHP ? (Y/n)" php
 if [[ "$php" != "n" ]] && [[ "$php" != "N" ]];
 then
     PS3='Select version to install : '
-    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "Cancel")
+    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "PHP 7.3" "Cancel")
     select opt in "${options[@]}"
     do
         case $opt in
             "PHP 5.6")
-                echo "Installing....";
+                echo "INFO :Installing....";
                 insPhp5;
                 break
                 ;;
             "PHP 7.0")
-                echo "Installing....";
+                echo "INFO :Installing....";
                 insPhp70;
                 break
                 ;;
             "PHP 7.1")
-                echo "Installing....";
+                echo "INFO :Installing....";
                 insPhp71;
                 break
                 ;;
-            "Cancel")
-                echo "Skipping install PHP";
+            "PHP 7.3")
+                echo "INFO :Installing....";
+                insPhp73;
                 break
                 ;;
-            *) echo "invalid option $REPLY";;
+            "Cancel")
+                echo "INFO :Skipping install PHP";
+                break
+                ;;
+            *) echo "INFO :invalid option $REPLY";;
         esac
     done
 fi
