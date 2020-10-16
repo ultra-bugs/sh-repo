@@ -327,10 +327,34 @@ function enablePhp73
     a2dismod php7.2
 #    a2enmod php7.3
     a2enmod proxy_fcgi setenvif
+    a2disconf php7.0-fpm
+    a2disconf php7.1-fpm
+    a2disconf php7.2-fpm
+    a2disconf php7.4-fpm
     a2enconf php7.3-fpm
     update-alternatives --set php /usr/bin/php7.3
     service apache2 restart
     service php7.3-fpm restart
+}
+
+function enablePhp74
+{
+    echo "INFO :Enabling PHP 7.3 FPM"
+    a2dismod php5
+    a2dismod php7.0
+    a2dismod php7.1
+    a2dismod php7.2
+    a2dismod php7.3
+#    a2enmod php7.3
+    a2enmod proxy_fcgi setenvif
+    a2disconf php7.0-fpm
+    a2disconf php7.1-fpm
+    a2disconf php7.2-fpm
+    a2disconf php7.3-fpm
+    a2enconf php7.4-fpm
+    update-alternatives --set php /usr/bin/php7.3
+    service apache2 restart
+    service php7.4-fpm restart
 }
 
 #PHP 5.6
@@ -365,6 +389,13 @@ function insPhp73
     echo "INFO :Installing PHP 7.3 (with FPM, No Apache Module) .........."
     apt-get install php7.3 php7.3-bcmath php7.3-bz2 php7.3-cli php7.3-common php7.3-curl php7.3-fpm php7.3-gd php7.3-json php7.3-mbstring php7.3-mysql php7.3-opcache php7.3-readline php7.3-xml php7.3-zip -y
     enablePhp73
+}
+
+function insPhp74
+{
+    echo "INFO :Installing PHP 7.4 (with FPM, No Apache Module) .........."
+    apt-get install php7.4 php7.4-bcmath php7.4-bz2 php7.4-cli php7.4-common php7.4-curl php7.4-fpm php7.4-gd php7.4-json php7.4-mbstring php7.4-mysql php7.4-opcache php7.4-readline php7.4-xml php7.4-zip -y
+    enablePhp74
 }
 
 # COMPOSER
@@ -458,7 +489,7 @@ read -p "Install PHP ? (Y/n)" php
 if [[ "$php" != "n" ]] && [[ "$php" != "N" ]];
 then
     PS3='Select version to install : '
-    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "PHP 7.3" "Cancel")
+    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "PHP 7.3" "PHP 7.4" "Cancel")
     select opt in "${options[@]}"
     do
         case $opt in
@@ -480,6 +511,11 @@ then
             "PHP 7.3")
                 echo "INFO :Installing....";
                 insPhp73;
+                break
+                ;;
+            "PHP 7.4")
+                echo "INFO :Installing....";
+                insPhp74;
                 break
                 ;;
             "Cancel")
