@@ -29,7 +29,11 @@ echo -e $'
          D.E.B.I.A.N  \e[32mE.A.S.Y\e[0m  L.A.M.P  \e[36mS.T.A.C.K\e[0m
          \e[35m* * * * * * * * * * * * * * * * * * * * *\e[0m
          \e[1;33m!  Just for running & serving the web  !\e[0m
+
+         SUPPORTED Versions: Debian 8 Wheezy,9 Stretch, 10 Buster
          ';
+
+if [[ "$(whoami)" != "root" ]]; then echo "         ERROR: This script can only work with root. Bye bye !"; exit; fi
 
 function getScriptDir
 {
