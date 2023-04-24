@@ -61,6 +61,9 @@ function checkDebVersion
         elif [[ "$codeName" == "buster" ]]; then
             echo "Buster - Debian 10";
             return 0;
+        elif [[ "$codeName" == "bullseye" ]]; then
+            echo "Bullseye - Debian 11";
+            return 0;
         else
             #NOT SUPPORTED !
             return 11;
@@ -92,9 +95,17 @@ deb-src http://ftp.debian.org/debian stretch-backports main contrib non-free" > 
             updateSrc
         elif [[ "$codeName" == "buster" ]]; then
             echo "INFO: Buster - Debian 10 Detected , installing";
-            if ! grep -q 'stretch' /etc/apt/sources.list.d/backport.list; then
+            if ! grep -q 'buster' /etc/apt/sources.list.d/backport.list; then
               echo "deb http://deb.debian.org/debian buster-backports main contrib non-free
 deb-src http://deb.debian.org/debian buster-backports main contrib non-free" > /etc/apt/sources.list.d/backport.list ;
+            fi
+            addSrcSury
+            updateSrc
+         elif [[ "$codeName" == "bullseye" ]]; then
+            echo "INFO: Buster - Debian 11 Detected , installing";
+            if ! grep -q 'bullseye' /etc/apt/sources.list.d/backport.list; then
+              echo "deb http://deb.debian.org/debian bullseye-backports main contrib non-free
+deb-src http://deb.debian.org/debian bullseye-backports main contrib non-free" > /etc/apt/sources.list.d/backport.list ;
             fi
             addSrcSury
             updateSrc
@@ -190,6 +201,14 @@ function mariaSrcDeb10
     add-apt-repository 'deb [arch=amd64] https://mirror.rackspace.com/mariadb/repo/10.5/debian buster main'
     updateSrc
 }
+function mariaSrcDeb11
+{
+    echo "INFO: Add Src : Maria DB v10.5 for Debian 11 (Mirror Rackspace)"
+    apt-get install software-properties-common dirmngr -y
+    apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
+    add-apt-repository 'deb [arch=amd64] https://mirror.rackspace.com/mariadb/repo/10.5/debian bullseye main'
+    updateSrc
+}
 
 #APACHE
 function insApache
@@ -220,6 +239,9 @@ function insMariaDB
         elif [[ "$codeName" == "buster" ]]; then
             echo "INFO: Debian 10 (buster) Detected , installing maria src";
             mariaSrcDeb10
+         elif [[ "$codeName" == "bullseye" ]]; then
+            echo "INFO: Debian 11 (bullseye) Detected , installing maria src";
+            mariaSrcDeb11
         else
             #NOT SUPPORTED !
             echo "NOT SUPPORTED OS , STOP !";
@@ -243,12 +265,20 @@ function insMariaDB
 function postInsNode
 {
     apt-get install -y build-essential
-    npm install -g npm gulp bower
+    npm install -g npm
 }
-
+function insNode14x
+{
+    echo "INFO :Start Install NODEJS 14.x .........."
+    apt-get install python-software-properties curl -y
+    curl -sL https://deb.nodesource.com/setup_14.x | bash -
+    apt-get install -y nodejs
+    postInsNode
+    printf "\e[33m NODEJS 12.x : Done ! \e[0m \n "
+}
 function insNode12x
 {
-    echo "INFO :Start Install NODEJS.........."
+    echo "INFO :Start Install NODEJS 12.x .........."
     apt-get install python-software-properties curl -y
     curl -sL https://deb.nodesource.com/setup_12.x | bash -
     apt-get install -y nodejs
@@ -270,7 +300,7 @@ function insNode
 {
     echo "INFO :Preparing install NODEJS.........."
     PS3='Select version to install : '
-    options=("NodeJs 6.x" "NodeJs 12.x" "Cancel")
+    options=("NodeJs 6.x" "NodeJs 12.x" "NodeJs 14.x" "Cancel")
     select opt in "${options[@]}"
     do
         case $opt in
@@ -284,8 +314,13 @@ function insNode
                 insNode12x;
                 break
                 ;;
+            "NodeJs 14.x")
+                echo "INFO :Installing....";
+                insNode14x;
+                break
+                ;;
             "Cancel")
-                echo "INFO :Skipping install PHP";
+                echo "INFO :Skipping install Node JS";
                 break
                 ;;
             *) echo "invalid option $REPLY";;
@@ -430,12 +465,12 @@ function udtPhpMyAdmin
         # cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
         # printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
     # fi
-  curl -sL https://raw.githubusercontent.com/z-programing/sh-repo/master/common/update-phpmyadmin.sh | bash -
+  curl -sL https://raw.githubusercontent.com/zuko-xdev/sh-repo/master/common/update-phpmyadmin.sh | bash -
 }
 
 function makeSwap
 {
-  curl -sL https://raw.githubusercontent.com/z-programing/sh-repo/master/common/mkswap.sh | bash -
+  curl -sL https://raw.githubusercontent.com/zuko-xdev/sh-repo/master/common/mkswap.sh | bash -
 }
 
 #PHP-My-Admin
@@ -444,10 +479,13 @@ function insPhpMyAdmin
     if [ "$(lsb_release -cs)" == "buster" ]; then
         echo "INFO : install php-twig on Debian 10"
         apt-get install -t buster-backports install php-twig -y
+    elif [ "$(lsb_release -cs)" == "bullseye" ]; then
+        echo "INFO : install php-twig on Debian 11"
+        apt-get install -t bullseye-backports install php-twig -y
     fi
     apt-get install phpmyadmin -y
     service apache2 restart
-    udtPhpMyAdmin
+    #udtPhpMyAdmin
     printf "\e[33m PHP-My-Admin : Done ! \e[0m \n "
 }
 
