@@ -3,7 +3,7 @@ if [ "$(whoami)" != 'root' ]; then
     echo $"You have no permission to run $0 as non-root user. Use sudo"
     exit 1;
 fi
-swapsize=1GB
+swapsize=1G
 swapname=swap
 function getSwapSize {
     echo "Enter Swapfile size in GB unit :"
@@ -11,18 +11,20 @@ function getSwapSize {
 	if [[ -z "${size//([0-9]+)(\.[0-9]+)?}" ]]; then echo fi 1; fi
 	if [[ -n "$size" ]];then echo fi 2; fi
 	if [[ "$size" -gt 0 ]];then 
-		swapsize=${size}GB;
+		swapsize=${size}G;
 		makeSwap;
 	fi
     if [[ -z "${size//([0-9]+)(\.[0-9]+)?}" ]] && [[ -n "$size" ]]; then
-        swapsize=${size}GB;
+        swapsize=${size}G;
         return 0;
     else getSwapSize; fi
 }
 function makeSwap
 {
 	echo "Creating fallocate file : /${swapname} with size : ${swapsize}"
-	fallocate -l ${swapsize} /${swapname}
+	#sizeInByte=$(($swapsize * 1024))
+	#fallocate -l ${swapsize} /${swapname}
+	dd if=/dev/zero of=/${swapname} bs=${swapsize} count=1 iflag=fullblock
 	echo chmod 600 /${swapname}
 	chmod 600 /${swapname}
 	echo makeSwap
