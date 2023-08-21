@@ -465,12 +465,12 @@ function udtPhpMyAdmin
         # cp -rvf phpMyAdmin-${MyadmVer}-all-languages/* ${MyadmPath}
         # printf "\e[33m Update PHP-My-Admin : v$MyadmVer Done ! \e[0m \n "
     # fi
-  curl -sL https://raw.githubusercontent.com/zuko-xdev/sh-repo/master/common/update-phpmyadmin.sh | bash -
+  curl -sL https://raw.githubusercontent.com/ultra-bugs/sh-repo/master/common/update-phpmyadmin.sh | bash -
 }
 
 function makeSwap
 {
-  curl -sL https://raw.githubusercontent.com/zuko-xdev/sh-repo/master/common/mkswap.sh | bash -
+  curl -sL https://raw.githubusercontent.com/ultra-bugs/sh-repo/master/common/mkswap.sh | bash -
 }
 
 #PHP-My-Admin
