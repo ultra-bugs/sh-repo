@@ -439,6 +439,24 @@ function insPhp74
     enablePhp74
 }
 
+function insPhp80
+{
+    echo "INFO :Installing PHP 7.4 (with FPM, No Apache Module) .........."
+    apt-get install php8.0 php8.0-bcmath php8.0-bz2 php8.0-cli php8.0-common php8.0-curl php8.0-fpm php8.0-gd php8.0-json php8.0-mbstring php8.0-mysql php8.0-opcache php8.0-readline php8.0-xml php8.0-zip -y
+}
+
+function insPhp81
+{
+    echo "INFO :Installing PHP 7.4 (with FPM, No Apache Module) .........."
+    apt-get install php8.1 php8.1-bcmath php8.1-bz2 php8.1-cli php8.1-common php8.1-curl php8.1-fpm php8.1-gd php8.1-json php8.1-mbstring php8.1-mysql php8.1-opcache php8.1-readline php8.1-xml php8.1-zip -y
+}
+
+function insPhp82
+{
+    echo "INFO :Installing PHP 7.4 (with FPM, No Apache Module) .........."
+    apt-get install php8.2 php8.2-bcmath php8.2-bz2 php8.2-cli php8.2-common php8.2-curl php8.2-fpm php8.2-gd php8.2-json php8.2-mbstring php8.2-mysql php8.2-opcache php8.2-readline php8.2-xml php8.2-zip -y
+}
+
 # COMPOSER
 function insComposer
 {
@@ -562,6 +580,21 @@ then
                 insPhp74;
                 break
                 ;;
+            "PHP 8.0")
+                echo "INFO :Installing....";
+                insPhp80;
+                break
+                ;;
+            "PHP 8.1")
+                echo "INFO :Installing....";
+                insPhp81;
+                break
+                ;;
+            "PHP 8.2")
+                echo "INFO :Installing....";
+                insPhp82;
+                break
+                ;;                
             "Cancel")
                 echo "INFO :Skipping install PHP";
                 break
