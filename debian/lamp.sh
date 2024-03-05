@@ -44,6 +44,15 @@ function getScriptDir
     echo ${DIR};
 }
 
+function isPackageInstalled
+{
+    if dpkg-query -s "$1" | grep -q "install ok installed"; then
+        return 0  # Package is installed
+    else
+        return 1  # Package is not installed
+    fi
+}
+
 function checkDebVersion
 {
     disId=$(lsb_release -is);
@@ -551,7 +560,7 @@ read -p "Install PHP ? (Y/n)" php
 if [[ "$php" != "n" ]] && [[ "$php" != "N" ]];
 then
     PS3='Select version to install : '
-    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "PHP 7.3" "PHP 7.4" "Cancel")
+    options=("PHP 5.6" "PHP 7.0" "PHP 7.1" "PHP 7.3" "PHP 7.4" "PHP 8.0" "PHP 8.1" "PHP 8.2" "Cancel")
     select opt in "${options[@]}"
     do
         case $opt in
@@ -632,6 +641,16 @@ read -p "Install Memcached Deamon & PHP Extension ? (Y/n)" memca
 if [[ "$memca" != "n" ]] && [[ "$memca" != "N" ]];
 then
     insMemcached
+fi
+
+read -p "Install Redis Server & PHP Redis Extension ? (Y/n)" predis
+if [[ "$predis" != "n" ]] && [[ "$predis" != "N" ]];
+then
+    echo "Installing Redis Server ...."
+    apt-get install redis -y
+    echo "Checking Installed PHP versions ...."
+    toInstall=""
+    for ()
 fi
 
 printf "\e[33m All opeation done ! \e[0m \n "
