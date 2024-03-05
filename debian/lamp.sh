@@ -650,7 +650,17 @@ then
     apt-get install redis -y
     echo "Checking Installed PHP versions ...."
     toInstall=""
-    for ()
+
+    # Iterate over the list of packages
+    for package in "PHP 5.6" "PHP 7.0" "PHP 7.1" "PHP 7.3" "PHP 7.4" "PHP 8.0" "PHP 8.1" "PHP 8.2"; do
+        package=$(echo "${package}" | tr -s ' ');
+        package=$(echo "${package}" | tr '[:upper:]' '[:lower:]')
+        if isPackageInstalled $package; then
+            toInstall="$toInstall ${package}-redis"
+        fi
+    done
+    echo "Install packages: $toInstall"
+    apt-get install $toInstall -y
 fi
 
 printf "\e[33m All opeation done ! \e[0m \n "
