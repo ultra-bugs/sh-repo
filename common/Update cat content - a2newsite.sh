@@ -85,7 +85,15 @@ echo "</VirtualHost>" >> $config_file
 # Display success message and restart Apache
 echo "Configuration file created successfully: ${config_file}"
 echo "Config file content"
+echo "================================================================================================"
+echo ""
+echo ""
+echo ""
 cat $config_file
+echo ""
+echo ""
+echo ""
+echo "================================================================================================"
 echo Enabling site ${subdomain}
 a2ensite $subdomain
 echo "Restarting Apache to apply changes..."
