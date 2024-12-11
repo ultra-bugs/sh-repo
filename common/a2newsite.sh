@@ -1,27 +1,58 @@
 #!/bin/bash
 echo "Apache2 debian based site configuration utility."
+# Function to scan for installed PHP-FPM versions
+scan_php_versions() {
+    local installed_versions=()
+    # Look for PHP-FPM packages and configuration files
+    for version in $(dpkg -l | grep "php.*-fpm" | grep -oP "php\d\.\d" | sort -u); do
+        if [ -f "/etc/apache2/conf-available/${version}-fpm.conf" ]; then
+            installed_versions+=("${version#php}")
+        fi
+    done
+    echo "${installed_versions[@]}"
+}
+
+# Function to validate and ask for PHP version
+get_php_version() {
+    # Get installed versions
+    local versions=($(scan_php_versions))
+    
+    if [ ${#versions[@]} -eq 0 ]; then
+        echo "No PHP-FPM versions found installed."
+        return 1
+    fi
+
+    # Show available versions
+    echo "Available PHP-FPM versions:"
+    echo "Default"
+    printf '%s\n' "${versions[@]}"
+    
+    while true; do
+        read -p "Choose PHP version to use (Default or one from above): " php_version
+        if [ "$php_version" = "Default" ]; then
+            break
+        fi
+        
+        # Check if chosen version is in installed versions
+        for version in "${versions[@]}"; do
+            if [ "$version" = "$php_version" ]; then
+                break 2
+            fi
+        done
+        
+        read -p "Invalid choice. Do you want to choose again? (y/n): " choice
+        if [[ "$choice" != "y" ]]; then
+            echo "Aborted. No changes made."
+            exit 1
+        fi
+    done
+}
+
 # Ask for subdomain name
 read -p "Enter domain name: " subdomain
 
 # Ask for directory name
 read -p "Enter directory name: " directory
-
-# Function to validate and ask for PHP version
-get_php_version() {
-    while true; do
-        read -p "Choose PHP version to use (Default, 7.4, 8.0, 8.1, 8.2): " php_version
-        case $php_version in
-            "Default"|"7.4"|"8.0"|"8.1"|"8.2")
-                break ;;
-            *)
-                read -p "Invalid choice. Do you want to choose again? (y/n): " choice
-                if [[ "$choice" != "y" ]]; then
-                    echo "Aborted. No changes made."
-                    exit 1
-                fi ;;
-        esac
-    done
-}
 
 # Ask for PHP version to use
 get_php_version
