@@ -43,13 +43,13 @@ get_swappiness_value() {
 get_swap_size_mb() {
     local size
     while true; do
-        echo "Enter swap size in GB (integer only):"
+        echo "Enter swap size in GB (integer only):" >&2
         read -r size
         if [[ "$size" =~ ^[1-9][0-9]*$ ]]; then
             echo $(( size * 1024 ))
             return 0
         fi
-        echo "Invalid input. Enter a positive integer."
+        echo "Invalid input. Enter a positive integer." >&2
     done
 }
 
