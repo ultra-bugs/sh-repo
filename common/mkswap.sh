@@ -10,24 +10,9 @@ get_available_ram_mb() {
 }
 
 get_debian_version() {
-    if [[ -f /etc/debian_version ]]; then
-        cut -d. -f1 /etc/debian_version
-    else
-        echo 0
-    fi
+    [[ -f /etc/debian_version ]] && cut -d. -f1 /etc/debian_version || echo 0
 }
 
-get_swappiness_value_no_stde() {
-    local ver
-    ver=$(get_debian_version)
-    if (( ver >= 12 )); then
-        echo "Debian ${ver} detected: setting swappiness=180 (zswap/zram optimized)"
-        echo 180
-    else
-        echo "Debian ${ver} (or non-Debian) detected: setting swappiness=88"
-        echo 88
-    fi
-}
 get_swappiness_value() {
     local ver
     ver=$(get_debian_version)
@@ -53,15 +38,50 @@ get_swap_size_mb() {
     done
 }
 
+# Find the sysctl target file for a given key.
+# Debian >= 13: search /etc/sysctl.d/*.conf for existing (non-commented) entry.
+# Falls back to creating /etc/sysctl.d/00.swap.conf if not found.
+# Debian < 13: use /etc/sysctl.conf
+get_sysctl_target() {
+    local key=$1
+    local ver
+    ver=$(get_debian_version)
+
+    if (( ver >= 13 )); then
+        local found
+        found=$(grep -rl "^${key}" /etc/sysctl.d/*.conf 2>/dev/null | head -1)
+        if [[ -n "$found" ]]; then
+            echo "$found"
+        else
+            echo "/etc/sysctl.d/00.swap.conf"
+        fi
+    else
+        echo "/etc/sysctl.conf"
+    fi
+}
+
 apply_sysctl() {
     local key=$1 val=$2
-    if grep -q "^${key}" /etc/sysctl.conf; then
-        echo "${key} already set: $(grep "^${key}" /etc/sysctl.conf)"
+    local target
+    target=$(get_sysctl_target "$key")
+
+    if [[ -f "$target" ]] && grep -q "^${key}" "$target"; then
+        echo "${key} already set in ${target}: $(grep "^${key}" "$target")"
         echo "Modify manually if needed."
     else
-        echo "${key} = ${val}" >> /etc/sysctl.conf
+        echo "${key} = ${val}" >> "$target"
         sysctl -w "${key}=${val}" > /dev/null
-        echo "Applied: ${key} = ${val}"
+        echo "Applied: ${key} = ${val} -> ${target}"
+    fi
+}
+
+add_fstab_entry() {
+    # Match only lines where the first field (device/path) is exactly SWAP_PATH
+    if awk '$1 == "'"${SWAP_PATH}"'" { found=1 } END { exit !found }' /etc/fstab; then
+        echo "/etc/fstab: ${SWAP_PATH} entry exists, skipping."
+    else
+        echo "${SWAP_PATH}   none    swap    sw    0   0" >> /etc/fstab
+        echo "Added ${SWAP_PATH} to /etc/fstab"
     fi
 }
 
@@ -84,16 +104,10 @@ make_swap() {
     echo "--- Swap status ---"
     swapon -s
 
-    if grep -q '\sswap\s' /etc/fstab; then
-        echo "/etc/fstab: swap entry exists, skipping."
-    else
-        echo "${SWAP_PATH}   none    swap    sw    0   0" >> /etc/fstab
-        echo "Added swap to /etc/fstab"
-    fi
+    add_fstab_entry
 
     local swappiness
     swappiness=$(get_swappiness_value)
-
     apply_sysctl "vm.swappiness" "$swappiness"
     apply_sysctl "vm.vfs_cache_pressure" 50
 
