@@ -2,8 +2,17 @@
 
 [[ "$(whoami)" != 'root' ]] && { echo "Run as root. Use sudo"; exit 1; }
 
-SWAP_NAME="swap"
-SWAP_PATH="/${SWAP_NAME}"
+# --- Arg parsing ---
+if [[ -z "$1" ]]; then
+    echo "Usage: $0 <size_gb> [swap_path]" >&2
+    exit 1
+fi
+if ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+    echo "Error: arg1 must be a positive integer (GB)." >&2
+    exit 1
+fi
+
+SWAP_PATH="${2:-/swap}"
 
 get_available_ram_mb() {
     awk '/MemAvailable/ { print int($2/1024) }' /proc/meminfo
@@ -114,5 +123,5 @@ make_swap() {
     echo "Swap setup complete!"
 }
 
-size_mb=$(get_swap_size_mb)
+size_mb=$(( $1 * 1024 ))
 make_swap "$size_mb"
